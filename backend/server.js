@@ -8,7 +8,11 @@ const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB
 connectDB().then(() => {
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
         console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
     });
+    
+    // Set server timeout to 10 minutes for slow AI processing
+    server.timeout = 600000;
+    server.keepAliveTimeout = 600000;
 });

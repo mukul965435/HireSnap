@@ -37,7 +37,16 @@ const ResumeUpload = () => {
             });
             navigate('/resumes');
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to upload resume');
+            console.error('Upload Error:', err.message, err.response?.data);
+
+            if (err.code === 'ECONNABORTED') {
+                setError('AI is still processing. Check your Resumes page in a moment.');
+            } else if (!err.response) {
+                // Network error - no response from server
+                setError(`Network error: ${err.message}. Make sure Ollama is running and the backend is up.`);
+            } else {
+                setError(err.response.data?.message || err.message || 'Failed to analyze resume.');
+            }
         } finally {
             setLoading(false);
         }

@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Resumes from './pages/Resumes';
 import ResumeUpload from './pages/ResumeUpload';
 import JobSearch from './pages/JobSearch';
+import ResumeDetail from './pages/ResumeDetail';
 import AIAnalyzer from './pages/AIAnalyzer';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
                     <Route element={<ProtectedRoute />}>
                         <Route path="/" element={<DashboardLayout><Dashboard /></DashboardLayout>} />
                         <Route path="/resumes" element={<DashboardLayout><Resumes /></DashboardLayout>} />
+                        <Route path="/resumes/:id" element={<DashboardLayout><ResumeDetail /></DashboardLayout>} />
                         <Route path="/upload" element={<DashboardLayout><ResumeUpload /></DashboardLayout>} />
                         <Route path="/jobs" element={<DashboardLayout><JobSearch /></DashboardLayout>} />
                         <Route path="/analyze" element={<DashboardLayout><AIAnalyzer /></DashboardLayout>} />

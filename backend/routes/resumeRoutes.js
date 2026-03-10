@@ -22,6 +22,7 @@ const upload = multer({
 router.post('/upload', protect, upload.single('resume'), resumeController.uploadResume);
 router.get('/', protect, resumeController.getUserResumes);
 router.get('/:id', protect, resumeController.getResumeById);
+router.delete('/:id', protect, resumeController.deleteResume);
 router.post('/compare', protect, resumeController.compareResumeToJob);
 
 export default router;

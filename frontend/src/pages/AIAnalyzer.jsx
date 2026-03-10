@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button, Card } from '../components/Common';
 import { Search, ChevronRight, Brain, AlertCircle, Sparkles } from 'lucide-react';
 import api from '../api/client';
 
 const AIAnalyzer = () => {
+    const location = useLocation();
     const [resumes, setResumes] = useState([]);
-    const [selectedResume, setSelectedResume] = useState('');
+    const [selectedResume, setSelectedResume] = useState(location.state?.resumeId || '');
     const [jobDescription, setJobDescription] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
@@ -16,13 +18,17 @@ const AIAnalyzer = () => {
             try {
                 const res = await api.get('/resumes');
                 setResumes(res.data.data);
-                if (res.data.data.length > 0) setSelectedResume(res.data.data[0]._id);
+                
+                // If we didn't get an ID from navigation, just pick the first one by default
+                if (res.data.data.length > 0 && !selectedResume) {
+                    setSelectedResume(res.data.data[0]._id);
+                }
             } catch (err) {
                 console.error(err);
             }
         };
         fetchResumes();
-    }, []);
+    }, [selectedResume]);
 
     const handleCompare = async () => {
         if (!selectedResume || !jobDescription) return;
@@ -36,7 +42,14 @@ const AIAnalyzer = () => {
             });
             setResult(res.data.data);
         } catch (err) {
-            setError('Failed to analyze. Please check your inputs.');
+            console.error('Match Error:', err.message, err.response?.data);
+            if (err.code === 'ECONNABORTED') {
+                setError('Match analysis timed out. The model is too slow right now.');
+            } else if (!err.response) {
+                setError(`Network issue: ${err.message}. Is the backend running?`);
+            } else {
+                setError(err.response.data?.message || err.message || 'Failed to analyze. Please check your inputs.');
+            }
         } finally {
             setLoading(false);
         }

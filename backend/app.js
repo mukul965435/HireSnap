@@ -5,6 +5,10 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 
+import authRoutes from './routes/authRoutes.js';
+import resumeRoutes from './routes/resumeRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
+
 dotenv.config();
 
 const app = express();
@@ -12,7 +16,7 @@ const app = express();
 // Security Middlewares
 app.use(helmet());
 app.use(cors({
-    origin: 'http://localhost:5173', // Vite default port
+    origin: [/localhost:\d+$/], // Allow any port on localhost
     credentials: true
 }));
 
@@ -29,9 +33,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 // Routes
-import authRoutes from './routes/authRoutes.js';
-import resumeRoutes from './routes/resumeRoutes.js';
-import jobRoutes from './routes/jobRoutes.js';
 app.use('/api/auth', authRoutes);
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/jobs', jobRoutes);
@@ -42,10 +43,19 @@ app.get('/health', (req, res) => {
 
 // Error Handler
 app.use((err, req, res, next) => {
-    const statusCode = err.statusCode || 500;
+    console.error('SERVER ERROR:', err);
+    let message = err.message || 'Internal Server Error';
+    let statusCode = err.statusCode || 500;
+
+    // Handle Zod Validation Errors
+    if (err.name === 'ZodError') {
+        statusCode = 400;
+        message = err.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+    }
+
     res.status(statusCode).json({
         success: false,
-        message: err.message || 'Internal Server Error',
+        message,
         stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
 });

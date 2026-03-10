@@ -44,13 +44,26 @@ const Dashboard = () => {
         fetchResumes();
     }, []);
 
+    // Prepare dynamic data for the chart
+    // Sort resumes from oldest to newest to show progression properly
+    const sortedResumes = [...resumes].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    
+    // Create labels (dates) and data points (scores)
+    const labels = sortedResumes.length > 0 
+        ? sortedResumes.map(r => new Date(r.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }))
+        : ['No Data'];
+        
+    const dataPoints = sortedResumes.length > 0 
+        ? sortedResumes.map(r => r.atsScore)
+        : [0];
+
     const chartData = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        labels,
         datasets: [
             {
                 fill: true,
                 label: 'ATS Score Progress',
-                data: [65, 72, 68, 79, 85, 92],
+                data: dataPoints,
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 tension: 0.4,
