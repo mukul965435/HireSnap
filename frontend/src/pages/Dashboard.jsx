@@ -11,9 +11,10 @@ import {
     Title,
     Tooltip,
     Legend,
-    Filler
+    Filler,
+    RadialLinearScale
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Line, Radar } from 'react-chartjs-2';
 
 ChartJS.register(
     CategoryScale,
@@ -23,7 +24,8 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend,
-    Filler
+    Filler,
+    RadialLinearScale
 );
 
 const Dashboard = () => {
@@ -82,6 +84,67 @@ const Dashboard = () => {
         },
     };
 
+    // --- SKILL GAP ANALYTICS (RADAR CHART) ---
+    // Categorize latest skills into buckets
+    const frontendSkills = ['react', 'javascript', 'typescript', 'html', 'css', 'next.js', 'vue', 'angular', 'bootstrap', 'tailwind'];
+    const backendSkills = ['node.js', 'express', 'python', 'django', 'java', 'spring', 'c#', 'php', 'ruby', 'go'];
+    const dbSkills = ['mongodb', 'postgresql', 'mysql', 'redis', 'sql', 'firebase', 'supabase', 'sqlite'];
+    const devopsSkills = ['aws', 'docker', 'jenkins', 'kubernetes', 'azure', 'ci/cd', 'git', 'linux', 'gcp', 'terraform'];
+
+    let scores = [0, 0, 0, 0]; // Frontend, Backend, Database, Cloud/DevOps
+    
+    if (sortedResumes.length > 0) {
+        const latestSkills = sortedResumes[sortedResumes.length - 1].parsedData.skills.map(s => s.toLowerCase());
+        latestSkills.forEach(skill => {
+            if (frontendSkills.some(fs => skill.includes(fs))) scores[0] += 20;
+            if (backendSkills.some(bs => skill.includes(bs))) scores[1] += 20;
+            if (dbSkills.some(ds => skill.includes(ds))) scores[2] += 20;
+            if (devopsSkills.some(ds => skill.includes(ds))) scores[3] += 20;
+        });
+    }
+
+    // Cap at 100
+    scores = scores.map(s => Math.min(s, 100));
+
+    const radarData = {
+        labels: ['Frontend', 'Backend', 'Database', 'Cloud & DevOps'],
+        datasets: [
+            {
+                label: 'Your Stack',
+                data: scores,
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderColor: '#3b82f6',
+                pointBackgroundColor: '#3b82f6',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#3b82f6'
+            },
+            {
+                label: 'Industry Average',
+                data: [70, 75, 60, 65], // Mock industry standard
+                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                borderColor: '#10b981',
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#10b981'
+            }
+        ]
+    };
+
+    const radarOptions = {
+        scales: {
+            r: {
+                angleLines: { color: 'rgba(255,255,255,0.1)' },
+                grid: { color: 'rgba(255,255,255,0.1)' },
+                pointLabels: { color: 'var(--text-secondary)', font: { size: 12 } },
+                ticks: { display: false, min: 0, max: 100 }
+            }
+        },
+        plugins: { legend: { labels: { color: 'var(--text-secondary)' } } }
+    };
+
+
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
@@ -123,13 +186,21 @@ const Dashboard = () => {
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem' }}>
-                <Card title="Score Improvement Trends">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem' }}>
+                <Card title="Score Improvement Trends" style={{ gridColumn: 'span 2' }}>
                     <div style={{ height: '300px' }}>
                         <Line data={chartData} options={options} />
                     </div>
                 </Card>
 
+                <Card title="Skill Gap Analytics" subtitle="You vs Industry Average" style={{ gridColumn: 'span 1' }}>
+                    <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Radar data={radarData} options={radarOptions} />
+                    </div>
+                </Card>
+            </div>
+
+            <div style={{ marginTop: '1.5rem' }}>
                 <Card title="Recent Resumes" subtitle="Latest uploads">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {resumes.slice(0, 4).map((resume, i) => (

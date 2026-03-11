@@ -75,13 +75,25 @@ const JobSearch = () => {
                                     <h3 style={{ fontSize: '1.125rem', marginBottom: '0.25rem' }}>{job.title}</h3>
                                     <p style={{ color: 'var(--accent-color)', fontWeight: 600, fontSize: '0.875rem' }}>{job.company}</p>
                                 </div>
-                                <span style={{
-                                    background: 'rgba(255, 255, 255, 0.05)',
-                                    padding: '0.25rem 0.5rem',
-                                    borderRadius: '6px',
-                                    fontSize: '0.75rem',
-                                    color: 'var(--text-secondary)'
-                                }}>{job.source}</span>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+                                    <span style={{
+                                        background: 'rgba(255, 255, 255, 0.05)',
+                                        padding: '0.25rem 0.5rem',
+                                        borderRadius: '6px',
+                                        fontSize: '0.75rem',
+                                        color: 'var(--text-secondary)'
+                                    }}>{job.source}</span>
+                                    {job.matchScore !== undefined && (
+                                        <span style={{
+                                            background: job.matchScore > 75 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                                            color: job.matchScore > 75 ? '#10b981' : '#f59e0b',
+                                            padding: '0.25rem 0.5rem',
+                                            borderRadius: '6px',
+                                            fontSize: '0.75rem',
+                                            fontWeight: 'bold'
+                                        }}>{job.matchScore}% Match</span>
+                                    )}
+                                </div>
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>

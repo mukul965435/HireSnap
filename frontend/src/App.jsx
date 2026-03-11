@@ -9,9 +9,10 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Resumes from './pages/Resumes';
 import ResumeUpload from './pages/ResumeUpload';
-import JobSearch from './pages/JobSearch';
 import ResumeDetail from './pages/ResumeDetail';
 import AIAnalyzer from './pages/AIAnalyzer';
+import CompareVersions from './pages/CompareVersions';
+import JobSearch from './pages/JobSearch';
 
 function App() {
     return (
@@ -25,6 +26,7 @@ function App() {
                         <Route path="/" element={<DashboardLayout><Dashboard /></DashboardLayout>} />
                         <Route path="/resumes" element={<DashboardLayout><Resumes /></DashboardLayout>} />
                         <Route path="/resumes/:id" element={<DashboardLayout><ResumeDetail /></DashboardLayout>} />
+                        <Route path="/compare" element={<DashboardLayout><CompareVersions /></DashboardLayout>} />
                         <Route path="/upload" element={<DashboardLayout><ResumeUpload /></DashboardLayout>} />
                         <Route path="/jobs" element={<DashboardLayout><JobSearch /></DashboardLayout>} />
                         <Route path="/analyze" element={<DashboardLayout><AIAnalyzer /></DashboardLayout>} />
