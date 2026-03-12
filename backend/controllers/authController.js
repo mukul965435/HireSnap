@@ -1,6 +1,8 @@
 import User from '../models/User.js';
 import * as tokenService from '../services/tokenService.js';
+import { sendTokenEmail } from '../services/emailService.js';
 import { z } from 'zod';
+import crypto from 'crypto';
 
 const registerSchema = z.object({
     fullName: z.string().min(2),
@@ -120,5 +122,67 @@ export const refreshToken = async (req, res, next) => {
         });
     } catch (error) {
         res.status(401).json({ success: false, message: 'Invalid refresh token' });
+    }
+};
+
+export const forgotPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            // Return 200 even if user not found to prevent email enumeration
+            return res.status(200).json({ success: true, message: 'If the email exists, an OTP has been sent.' });
+        }
+
+        // Generate 6 digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        user.resetPasswordOtp = otp;
+        user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes from now
+        await user.save();
+
+        const emailSent = await sendTokenEmail(user.email, otp);
+
+        if (!emailSent) {
+            user.resetPasswordOtp = undefined;
+            user.resetPasswordExpires = undefined;
+            await user.save();
+            return res.status(500).json({ success: false, message: 'Email could not be sent' });
+        }
+
+        res.status(200).json({ success: true, message: 'OTP sent to email successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const resetPassword = async (req, res, next) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({ success: false, message: 'Email, OTP, and new password are required' });
+        }
+
+        const user = await User.findOne({ 
+            email,
+            resetPasswordOtp: otp,
+            resetPasswordExpires: { $gt: Date.now() }
+        }).select('+resetPasswordOtp +resetPasswordExpires');
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+        }
+
+        user.password = newPassword;
+        user.resetPasswordOtp = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        res.status(200).json({ success: true, message: 'Password has been reset successfully. You can now login.' });
+    } catch (error) {
+        next(error);
     }
 };

@@ -6,6 +6,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 // Pages (to be implemented)
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import Resumes from './pages/Resumes';
 import ResumeUpload from './pages/ResumeUpload';
@@ -21,6 +22,7 @@ function App() {
                 <Routes>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
 
                     <Route element={<ProtectedRoute />}>
                         <Route path="/" element={<DashboardLayout><Dashboard /></DashboardLayout>} />
