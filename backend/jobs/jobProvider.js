@@ -1,66 +1,53 @@
+import adzunaAdapter from './adapters/adzuna.js';
 import linkedinAdapter from './adapters/linkedin.js';
 import naukriAdapter from './adapters/naukri.js';
 import instahyreAdapter from './adapters/instahyre.js';
 
 class JobProvider {
     constructor() {
-        this.adapters = [
-            linkedinAdapter,
-            naukriAdapter,
-            instahyreAdapter
-        ];
+        this.primaryAdapter = adzunaAdapter;
+        this.fallbackAdapters = [linkedinAdapter, naukriAdapter, instahyreAdapter];
     }
 
     async fetchJobs(filters = {}) {
-        // Run all adapters concurrently
-        const jobsArrays = await Promise.all(
-            this.adapters.map(adapter => adapter.fetchJobs(filters.skills, filters.location))
-        );
+        const skills = filters.skills || [];
+        const location = filters.location || '';
 
-        // Flatten array of arrays
-        let allJobs = jobsArrays.flat();
+        // 1. Try real Adzuna API first
+        let jobs = await this.primaryAdapter.fetchJobs(skills, location);
 
-        // If no skills are provided, just return all jobs simulating a "Discover" feed
-        if (!filters || !filters.skills || filters.skills.length === 0) {
-            return allJobs.sort(() => Math.random() - 0.5); // Random shuffle for default view
+        // 2. Fall back to mock data if Adzuna not configured or returns nothing
+        if (jobs.length === 0) {
+            console.info('[JobProvider] Using mock adapters as fallback.');
+            const jobsArrays = await Promise.all(
+                this.fallbackAdapters.map(adapter => adapter.fetchJobs(skills, location))
+            );
+            jobs = jobsArrays.flat();
+
+            // Score mock jobs using same skill intersection method
+            if (skills.length > 0) {
+                const userSkillsLower = skills.map(s => s.toLowerCase());
+                jobs = jobs.map(job => {
+                    const jobSkillsLower = (job.skills || []).map(s => s.toLowerCase());
+                    let matchCount = 0;
+                    for (const js of jobSkillsLower) {
+                        if (userSkillsLower.some(us => us.includes(js) || js.includes(us))) matchCount++;
+                    }
+                    const matchScore = jobSkillsLower.length > 0
+                        ? Math.round((matchCount / jobSkillsLower.length) * 100)
+                        : 0;
+                    return { ...job, matchScore };
+                });
+            }
         }
 
-        const userSkillsLowercase = filters.skills.map(s => s.toLowerCase());
+        // 3. Shuffle if no skill filter (Discover mode)
+        if (skills.length === 0) {
+            return jobs.sort(() => Math.random() - 0.5);
+        }
 
-        // Standardize skill matching algorithm
-        const scoredJobs = allJobs.map(job => {
-            const jobSkillsLowercase = job.skills.map(s => s.toLowerCase());
-            let matchCount = 0;
-
-            // Simple intersection scoring
-            for (const requiredSkill of jobSkillsLowercase) {
-                // Check if user has this exact skill, or if there's a strong substring match
-                const hasSkill = userSkillsLowercase.some(
-                    userSkill => userSkill.includes(requiredSkill) || requiredSkill.includes(userSkill)
-                );
-                
-                if (hasSkill) matchCount++;
-            }
-
-            // Calculate match percentage (0 to 100)
-            const matchScore = job.skills.length > 0 
-                ? Math.round((matchCount / job.skills.length) * 100) 
-                : 0;
-
-            return {
-                ...job,
-                matchScore
-            };
-        });
-
-        // Filter out completely irrelevant jobs (e.g., jobs with 0 match if strict filtering is desired)
-        // For a better UX in demos, we'll keep jobs with matchScore > 0
-        const relevantJobs = scoredJobs.filter(job => job.matchScore > 0);
-
-        // Sort by match score (highest first)
-        relevantJobs.sort((a, b) => b.matchScore - a.matchScore);
-
-        return relevantJobs;
+        // 4. Sort by match score descending — best matches first
+        return jobs.sort((a, b) => b.matchScore - a.matchScore);
     }
 }
 
