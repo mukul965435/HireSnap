@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 
-:root {
+/* ─── DARK THEME (default) ──────────────────────────────────── */
+:root,
+[data-theme="dark"] {
   --bg-color: #050505;
   --panel-color: #0f0f0f;
   --border-color: #1a1a1a;
@@ -12,8 +14,73 @@
   --success-color: #10b981;
   --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Sidebar */
+  --sidebar-bg: rgba(9, 9, 9, 0.85);
+  --nav-active-bg: rgba(255, 255, 255, 0.08);
+  --nav-active-color: #ffffff;
+  --nav-hover-bg: rgba(255, 255, 255, 0.04);
+
+  /* Glass cards */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-hover-bg: rgba(255, 255, 255, 0.05);
+  --glass-hover-border: rgba(255, 255, 255, 0.1);
+
+  /* Input */
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-focus-bg: rgba(255, 255, 255, 0.08);
+  --input-color: #ffffff;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #1a1a1a;
+  --scrollbar-hover: #333333;
 }
 
+/* ─── LIGHT THEME ────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg-color: #f0f4ff;
+  --panel-color: #ffffff;
+  --border-color: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --accent-color: #2563eb;
+  --accent-gradient: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+  --danger-color: #dc2626;
+  --success-color: #059669;
+  --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Sidebar */
+  --sidebar-bg: rgba(255, 255, 255, 0.92);
+  --nav-active-bg: rgba(37, 99, 235, 0.1);
+  --nav-active-color: #2563eb;
+  --nav-hover-bg: rgba(37, 99, 235, 0.05);
+
+  /* Glass cards */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.07);
+  --glass-hover-bg: rgba(255, 255, 255, 0.95);
+  --glass-hover-border: rgba(37, 99, 235, 0.2);
+
+  /* Input */
+  --input-bg: rgba(0, 0, 0, 0.04);
+  --input-focus-bg: rgba(37, 99, 235, 0.05);
+  --input-color: #0f172a;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-hover: #94a3b8;
+}
+
+/* ─── THEME TRANSITION ───────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.15s ease, box-shadow 0.35s ease;
+}
+
+/* ─── RESET ──────────────────────────────────────────────────── */
 * {
   margin: 0;
   padding: 0;
@@ -53,48 +120,38 @@ a {
   padding: 0 2rem;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
+/* ─── SCROLLBAR ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-color);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #333;
-}
-
-/* Glassmorphism Classes */
+/* ─── GLASSMORPHISM ──────────────────────────────────────────── */
 .glass {
-  background: rgba(15, 15, 15, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--glass-bg);
   backdrop-filter: blur(10px);
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
   padding: 1.5rem;
   transition: var(--transition-smooth);
+  box-shadow: var(--card-shadow);
 }
 
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--glass-hover-border);
   transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-hover-bg);
+  box-shadow: var(--card-shadow);
 }
 
-/* Gradient Text */
+/* ─── GRADIENT TEXT ──────────────────────────────────────────── */
 .gradient-text {
   background: var(--accent-gradient);
   -webkit-background-clip: text;
@@ -102,20 +159,126 @@ a {
   color: transparent;
 }
 
-/* Inputs */
+/* ─── INPUTS ─────────────────────────────────────────────────── */
 input, textarea, select {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--input-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.75rem 1rem;
-  color: white;
+  color: var(--text-primary);
   width: 100%;
   font-family: inherit;
   transition: var(--transition-smooth);
 }
 
+input::placeholder, textarea::placeholder {
+  color: var(--text-secondary);
+}
+
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--accent-color);
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--input-focus-bg);
+}
+
+/* Light mode select option fix */
+[data-theme="light"] select option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+/* ─── THEME TOGGLE BUTTON ────────────────────────────────────── */
+.theme-toggle {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  flex-shrink: 0;
+  background: var(--toggle-track-bg, #1a1a1a);
+  transition: background 0.4s ease;
+  box-shadow: inset 0 0 0 1px var(--border-color), 0 2px 8px rgba(0,0,0,0.25);
+}
+
+[data-theme="light"] .theme-toggle {
+  --toggle-track-bg: #bfdbfe;
+}
+[data-theme="dark"] .theme-toggle {
+  --toggle-track-bg: #1e293b;
+}
+
+.theme-toggle__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s ease;
+  pointer-events: none;
+}
+
+[data-theme="dark"] .theme-toggle__thumb {
+  transform: translateX(0px);
+  background: linear-gradient(135deg, #334155, #1e293b);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+[data-theme="light"] .theme-toggle__thumb {
+  transform: translateX(28px);
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.5);
+}
+
+/* Theme toggle wrapper in sidebar */
+.theme-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
+.theme-toggle-wrapper:hover {
+  background: var(--nav-hover-bg);
+}
+
+.theme-toggle-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  flex: 1;
+  font-weight: 500;
+}
+
+/* ─── SPINNER ────────────────────────────────────────────────── */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
 }
