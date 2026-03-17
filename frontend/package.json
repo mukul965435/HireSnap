@@ -9,19 +9,27 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.2.4",
     "axios": "^1.13.5",
     "chart.js": "^4.5.1",
-    "framer-motion": "^12.34.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
     "lucide-react": "^0.575.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "react-chartjs-2": "^5.3.1",
-    "react-router-dom": "^7.13.1"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^7.13.1",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.2.1",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.1",
     "vite": "^5.0.0"
   }
 }

@@ -1,77 +1,62 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 export const Button = ({ children, variant = 'primary', size = 'md', className = '', ...props }) => {
-    const baseStyles = {
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontWeight: 600,
-        borderRadius: '10px',
-        transition: 'var(--transition-smooth)',
-        gap: '0.5rem',
-        border: 'none',
-        outline: 'none',
+    const baseClass = `btn btn-${variant}`;
+    const sizeMap = {
+        sm: { padding: '0.5rem 1rem', fontSize: '0.8rem' },
+        md: { padding: '0.7rem 1.4rem', fontSize: '0.875rem' },
+        lg: { padding: '0.9rem 1.8rem', fontSize: '1rem' },
     };
-
-    const variants = {
-        primary: {
-            background: 'var(--accent-gradient)',
-            color: 'white',
-            boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)',
-        },
-        secondary: {
-            background: 'rgba(255, 255, 255, 0.08)',
-            color: 'white',
-            border: '1px solid var(--border-color)',
-        },
-        outline: {
-            background: 'transparent',
-            color: 'white',
-            border: '1px solid var(--border-color)',
-        },
-        ghost: {
-            background: 'transparent',
-            color: 'var(--text-secondary)',
-        },
-    };
-
-    const sizes = {
-        sm: { padding: '0.5rem 1rem', fontSize: '0.875rem' },
-        md: { padding: '0.75rem 1.5rem', fontSize: '1rem' },
-        lg: { padding: '1rem 2rem', fontSize: '1.125rem' },
-    };
-
-    const currentVariant = variants[variant] || variants.primary;
-    const currentSize = sizes[size] || sizes.md;
 
     return (
-        <button
-            style={{ ...baseStyles, ...currentVariant, ...currentSize }}
-            className={className}
+        <motion.button
+            whileHover={{ scale: 1.02, y: -1 }}
+            whileTap={{ scale: 0.97 }}
+            className={`${baseClass} ${className}`}
+            style={sizeMap[size] || sizeMap.md}
             {...props}
         >
             {children}
-        </button>
+        </motion.button>
     );
 };
 
-export const Card = ({ children, title, subtitle, footer, className = '', ...props }) => {
+export const Card = ({ children, title, subtitle, footer, className = '', hoverable = true, ...props }) => {
+    const Wrapper = hoverable ? motion.div : 'div';
+    const motionProps = hoverable
+        ? { whileHover: { y: -3, boxShadow: '0 20px 56px rgba(0,0,0,0.1)' }, transition: { duration: 0.25 } }
+        : {};
+
     return (
-        <div className={`glass-card ${className}`} {...props}>
+        <Wrapper className={`card ${className}`} {...motionProps} {...props}>
             {(title || subtitle) && (
-                <div style={{ marginBottom: '1.5rem' }}>
-                    {title && <h3 style={{ fontSize: '1.25rem', marginBottom: '0.25rem' }}>{title}</h3>}
-                    {subtitle && <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{subtitle}</p>}
+                <div style={{ marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)' }}>
+                    {title && <h3 style={{ fontSize: '1rem', fontWeight: 700, letterSpacing: '-0.01em' }}>{title}</h3>}
+                    {subtitle && <p style={{ color: 'var(--text-2)', fontSize: '0.85rem', marginTop: '0.25rem' }}>{subtitle}</p>}
                 </div>
             )}
-            <div className="card-content">
-                {children}
-            </div>
+            {children}
             {footer && (
-                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
+                <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
                     {footer}
                 </div>
             )}
-        </div>
+        </Wrapper>
     );
 };
+
+export const Badge = ({ children, variant = 'neutral', ...props }) => (
+    <span className={`badge badge-${variant}`} {...props}>{children}</span>
+);
+
+export const Pill = ({ children, ...props }) => (
+    <span className="pill" {...props}>{children}</span>
+);
+
+export const SectionLabel = ({ children, icon: Icon }) => (
+    <p className="section-label">
+        {Icon && <Icon size={12} />}
+        {children}
+    </p>
+);
