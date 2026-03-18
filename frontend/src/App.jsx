@@ -14,6 +14,7 @@ import ResumeDetail from './pages/ResumeDetail';
 import AIAnalyzer from './pages/AIAnalyzer';
 import CompareVersions from './pages/CompareVersions';
 import JobSearch from './pages/JobSearch';
+import Profile from './pages/Profile';
 
 function App() {
     return (
@@ -28,6 +29,7 @@ function App() {
 
                     {/* Protected dashboard routes */}
                     <Route element={<ProtectedRoute />}>
+                        <Route path="/profile" element={<DashboardLayout><Profile /></DashboardLayout>} />
                         <Route path="/dashboard" element={<DashboardLayout><Dashboard /></DashboardLayout>} />
                         <Route path="/resumes" element={<DashboardLayout><Resumes /></DashboardLayout>} />
                         <Route path="/resumes/:id" element={<DashboardLayout><ResumeDetail /></DashboardLayout>} />

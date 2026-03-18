@@ -1,11 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-    Zap, ArrowRight, CheckCircle, Star, TrendingUp,
-    FileText, Briefcase, Target, ChevronRight, Search,
-    BarChart2, Award, Upload, Brain, Sparkles
+    Zap, ArrowRight, CheckCircle, TrendingUp,
+    FileText, Briefcase, Target,
+    BarChart2, Award, Brain,
+    LayoutDashboard, GitCompare, Search
 } from 'lucide-react';
+import FloatingPillNav from '../components/FloatingPillNav';
 
 /* ─── Floating element styles ────────────────────────────────── */
 const floatAnim = {
@@ -102,117 +104,84 @@ const ResumeCard = () => (
     </motion.div>
 );
 
-/* ─── Floating Pill Navbar ───────────────────────────────────── */
+/* ─── Navigation Items ───────────────────────────────────────── */
+
+const LANDING_NAV_ITEMS = [
+    { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/resumes',   icon: FileText,        label: 'Resumes'   },
+    { to: '/compare',   icon: GitCompare,      label: 'Compare'   },
+    { to: '/jobs',      icon: Briefcase,       label: 'Job Search'},
+    { to: '/analyze',   icon: Search,          label: 'AI Analyzer'},
+];
+
+/* ─── Landing Navbar (uses shared pill shell) ────────────────── */
 const Navbar = () => {
     const navigate = useNavigate();
-    return (
-        /* Full-width fixed wrapper — transparent bg, just positions the pill */
-        <div style={{
-            position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-            display: 'flex', justifyContent: 'center',
-            padding: '1rem 2rem',
-            pointerEvents: 'none', // let clicks pass through empty space
-        }}>
-            <motion.nav
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-                style={{
-                    pointerEvents: 'all', // re-enable clicks on the pill itself
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.25rem',
-                    padding: '0.45rem 0.45rem 0.45rem 1rem',
-                    background: 'rgba(255,255,255,0.92)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: 999,
-                    border: '1px solid rgba(0,0,0,0.09)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
-                    width: 'fit-content',
-                    maxWidth: 780,
-                }}
-            >
-                {/* Logo */}
-                <div
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', cursor: 'pointer', marginRight: '0.75rem', flexShrink: 0 }}
-                    onClick={() => navigate('/')}
-                >
-                    <div style={{
-                        width: 28, height: 28,
-                        background: 'linear-gradient(135deg,#2563eb,#7c3aed)',
-                        borderRadius: 8,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                        <Zap size={14} color="white" fill="white" />
-                    </div>
-                    <span style={{ fontWeight: 800, fontSize: '0.95rem', letterSpacing: '-0.03em', color: '#0a0a0a', whiteSpace: 'nowrap' }}>
-                        HireSnap
-                    </span>
-                </div>
 
-                {/* Divider */}
-                <div style={{ width: 1, height: 18, background: 'rgba(0,0,0,0.1)', marginRight: '0.5rem', flexShrink: 0 }} />
-
-                {/* Nav links */}
-                {['Features', 'How it works', 'Pricing', 'Blog'].map(l => (
-                    <a
-                        key={l}
-                        href="#"
-                        style={{
-                            padding: '0.5rem 0.85rem',
-                            fontSize: '0.875rem', color: '#525252', fontWeight: 500,
-                            textDecoration: 'none', borderRadius: 999,
-                            transition: 'background 0.15s, color 0.15s',
-                            whiteSpace: 'nowrap',
-                        }}
-                        onMouseOver={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; e.currentTarget.style.color = '#0a0a0a'; }}
-                        onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#525252'; }}
-                    >
-                        {l}
-                    </a>
-                ))}
-
-                {/* Spacer */}
-                <div style={{ flex: 1, minWidth: '1rem' }} />
-
-                {/* Log in — plain text */}
-                <motion.button
-                    whileHover={{ color: '#0a0a0a' }}
-                    onClick={() => navigate('/login')}
+    const leftSlot = (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+            {LANDING_NAV_ITEMS.map(item => (
+                <Link
+                    key={item.label}
+                    to={item.to}
                     style={{
-                        background: 'transparent', border: 'none',
-                        padding: '0.5rem 0.85rem', borderRadius: 999,
-                        fontSize: '0.875rem', fontWeight: 600, color: '#525252',
-                        cursor: 'pointer', whiteSpace: 'nowrap',
-                        transition: 'color 0.15s',
-                    }}
-                    onMouseOver={e => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
-                    onMouseOut={e => e.currentTarget.style.background = 'transparent'}
-                >
-                    Log in
-                </motion.button>
-
-                {/* CTA pill button */}
-                <motion.button
-                    whileHover={{ scale: 1.04, boxShadow: '0 6px 20px rgba(0,0,0,0.22)' }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => navigate('/register')}
-                    style={{
-                        background: '#0a0a0a', color: 'white',
-                        padding: '0.55rem 1.2rem', borderRadius: 999,
-                        fontSize: '0.875rem', fontWeight: 600,
-                        border: 'none', cursor: 'pointer',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
+                        display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                        padding: '0.45rem 0.75rem', borderRadius: 999,
+                        fontSize: '0.825rem', fontWeight: 500,
+                        color: '#737373', textDecoration: 'none',
+                        transition: 'background 0.15s, color 0.15s',
                         whiteSpace: 'nowrap',
-                        display: 'flex', alignItems: 'center', gap: '0.4rem',
                     }}
+                    onMouseOver={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; e.currentTarget.style.color = '#0a0a0a'; }}
+                    onMouseOut={e =>  { e.currentTarget.style.background = 'transparent';       e.currentTarget.style.color = '#737373';  }}
                 >
-                    Get started free
-                </motion.button>
-            </motion.nav>
+                    <item.icon size={14} />
+                    {item.label}
+                </Link>
+            ))}
         </div>
     );
+
+    const rightSlot = (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            {/* Log in — ghost */}
+            <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() => navigate('/login')}
+                style={{
+                    background: 'transparent', border: 'none',
+                    padding: '0.45rem 0.8rem', borderRadius: 999,
+                    fontSize: '0.825rem', fontWeight: 600,
+                    color: '#737373', cursor: 'pointer',
+                    transition: 'background 0.15s, color 0.15s',
+                    whiteSpace: 'nowrap',
+                }}
+                onMouseOver={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; e.currentTarget.style.color = '#0a0a0a'; }}
+                onMouseOut={e =>  { e.currentTarget.style.background = 'transparent';       e.currentTarget.style.color = '#737373';  }}
+            >
+                Log in
+            </motion.button>
+
+            {/* Get started — dark pill */}
+            <motion.button
+                whileHover={{ scale: 1.04, boxShadow: '0 6px 20px rgba(0,0,0,0.22)' }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => navigate('/register')}
+                style={{
+                    background: '#0a0a0a', color: 'white',
+                    padding: '0.45rem 1.1rem', borderRadius: 999,
+                    fontSize: '0.825rem', fontWeight: 600,
+                    border: 'none', cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
+                    whiteSpace: 'nowrap',
+                }}
+            >
+                Get started free
+            </motion.button>
+        </div>
+    );
+
+    return <FloatingPillNav leftSlot={leftSlot} rightSlot={rightSlot} onLogoClick={() => navigate('/')} />;
 };
 
 
