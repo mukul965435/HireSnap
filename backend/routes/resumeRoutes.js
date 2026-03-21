@@ -24,5 +24,6 @@ router.get('/', protect, resumeController.getUserResumes);
 router.get('/:id', protect, resumeController.getResumeById);
 router.delete('/:id', protect, resumeController.deleteResume);
 router.post('/compare', protect, resumeController.compareResumeToJob);
+router.post('/generate-cover-letter', protect, resumeController.generateCoverLetter);
 
 export default router;

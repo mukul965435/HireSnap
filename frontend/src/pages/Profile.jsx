@@ -8,6 +8,8 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
 import { useNavigate } from 'react-router-dom';
 
+const BACKEND_URL = 'http://localhost:5000';
+
 /* ─── Animation variants ─────────────────────────────────────── */
 const container = {
     hidden: { opacity: 0 },
@@ -23,11 +25,13 @@ const item = {
 };
 
 const Profile = () => {
-    const { user } = useAuth();
+    const { user, updateUser } = useAuth();
     const navigate = useNavigate();
     const [resumes, setResumes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(false);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const fileInputRef = React.useRef(null);
     
     // Form states
     const [formData, setFormData] = useState({
@@ -62,9 +66,46 @@ const Profile = () => {
         (Array.isArray(resumes) ? resumes : []).flatMap(r => r.parsedData?.skills || [])
     )).slice(0, 15);
 
-    const handleSave = () => {
-        setEditing(false);
-        // In a real app, call API to update user
+    const handleSave = async () => {
+        try {
+            const res = await api.put('/users/profile', {
+                fullName: formData.fullName,
+                bio: formData.bio
+            });
+            if (res.data?.success) {
+                updateUser(res.data.user);
+                setEditing(false);
+            }
+        } catch (err) {
+            console.error("Error updating profile:", err);
+            setEditing(false);
+        }
+    };
+
+    const handleAvatarClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleAvatarChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        try {
+            setUploadingAvatar(true);
+            const res = await api.put('/users/profile', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            if (res.data?.success) {
+                updateUser(res.data.user);
+            }
+        } catch (err) {
+            console.error("Error uploading avatar:", err);
+        } finally {
+            setUploadingAvatar(false);
+        }
     };
 
     return (
@@ -78,22 +119,48 @@ const Profile = () => {
                 position: 'relative', overflow: 'hidden'
             }}>
                 <div style={{ position: 'relative' }}>
+                    <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        onChange={handleAvatarChange} 
+                        style={{ display: 'none' }} 
+                        accept="image/*" 
+                    />
                     <div style={{ 
                         width: 120, height: 120, borderRadius: '50%', 
-                        background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
+                        background: user?.avatar ? 'none' : 'linear-gradient(135deg, #2563eb, #7c3aed)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 12px 24px rgba(37, 99, 235, 0.3)'
+                        boxShadow: '0 12px 24px rgba(37, 99, 235, 0.3)',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        border: user?.avatar ? '4px solid white' : 'none'
                     }}>
-                        <User size={60} color="white" />
+                        {user?.avatar ? (
+                            <img 
+                                src={`${BACKEND_URL}${user.avatar}`} 
+                                alt="Profile" 
+                                crossOrigin="anonymous"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                            />
+                        ) : (
+                            <User size={60} color="white" />
+                        )}
+                        {uploadingAvatar && (
+                            <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Clock size={24} className="animate-spin text-blue-600" />
+                            </div>
+                        )}
                     </div>
                     <motion.button 
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
+                        onClick={handleAvatarClick}
                         style={{
                             position: 'absolute', bottom: 0, right: 0,
                             width: 36, height: 36, borderRadius: '50%', background: 'white',
                             border: '1px solid #e5e5e5', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                            cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            zIndex: 10
                         }}
                     >
                         <Camera size={18} color="#0a0a0a" />

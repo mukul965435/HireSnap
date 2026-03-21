@@ -107,3 +107,26 @@ export const compareResumeToJob = async (req, res, next) => {
         next(error);
     }
 };
+export const generateCoverLetter = async (req, res, next) => {
+    try {
+        const { resumeId, jobDescription, tone } = req.body;
+        if (!resumeId || !jobDescription) {
+            return res.status(400).json({ success: false, message: 'Resume ID and Job Description are required' });
+        }
+
+        const resume = await Resume.findOne({ _id: resumeId, user: req.user._id });
+        if (!resume) {
+            return res.status(404).json({ success: false, message: 'Resume not found' });
+        }
+
+        const coverLetter = await aiProvider.generateCoverLetter(resume.rawText, jobDescription, tone);
+
+        res.status(200).json({
+            success: true,
+            data: coverLetter
+        });
+    } catch (error) {
+        console.error('Cover Letter Generation Error:', error.message);
+        next(error);
+    }
+};

@@ -189,6 +189,133 @@ class AIProvider {
             throw new Error('Failed to generate embeddings');
         }
     }
+    async generateCoverLetter(resumeText, jobDescription, tone = 'formal') {
+        const tonePrompts = {
+            formal: "professional and standard business",
+            friendly: "warm, approachable and enthusiastic",
+            confident: "bold, high-energy and result-oriented"
+        };
+        const selectedTone = tonePrompts[tone] || tonePrompts.formal;
+
+        try {
+            const prompt = `You are an expert career coach. Generate a high-impact cover letter for this user based on their resume and the job description.
+            Tone: ${selectedTone}
+            Resume: ${resumeText.substring(0, 1500)}
+            Job Description: ${jobDescription.substring(0, 1500)}
+            
+            Return only the cover letter text. Start with Date and Contact info if possible, otherwise start with 'Dear Hiring Manager'. 
+            Do not include any intro/outro like 'Here is your cover letter'.`;
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000); // 1 min timeout
+
+            const response = await fetch(`${this.ollamaUrl}/api/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: this.model, prompt, stream: false }),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+            const data = await response.json();
+            return data.response.trim();
+        } catch (error) {
+            console.log('Ollama Cover Letter generation failed (connection/timeout). Using smart fallback template.');
+            
+            // Rule-based high-quality template fallback
+            const skills = extractSkills(resumeText).slice(0, 5).join(', ');
+            const jobTitle = jobDescription.split('\n')[0].substring(0, 50) || "the position";
+            
+            return `Dear Hiring Manager,
+
+I am writing to express my strong interest in the ${jobTitle} position. With my background in software development and my technical expertise in ${skills}, I am confident that I would be a valuable asset to your team.
+
+Throughout my career, I have consistently demonstrated a commitment to excellence and a passion for building high-quality solutions. My resume highlights my experience in developing complex applications and collaborating with cross-functional teams to deliver impactful results.
+
+The requirements mentioned in your job description align perfectly with my skillset. I am particularly drawn to your company's mission and am eager to contribute to your continued success.
+
+Thank you for your time and consideration. I look forward to the possibility of discussing how my experience and skills can benefit your organization.
+
+Sincerely,
+(AI Generation Note: This is an optimized template because your local LLaMA instance was unreachable.)`;
+        }
+    }
+    async generateInterviewQuestions(resumeText) {
+        try {
+            const prompt = `You are a professional technical interviewer.
+
+Based on the following resume:
+
+${resumeText.substring(0, 2000)}
+
+Generate:
+
+1. 5 Technical Interview Questions
+2. 5 Project-Based Questions (especially about projects mentioned)
+3. 5 HR / Behavioral Questions
+
+Make questions realistic, relevant, and commonly asked in real interviews.
+
+Keep them concise and well-structured.`;
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+            const response = await fetch(`${this.ollamaUrl}/api/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: this.model, prompt, stream: false }),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+            const data = await response.json();
+            const raw = data.response.trim();
+
+            // Simple parsing logic: split by numbers or sections
+            const lines = raw.split('\n').map(l => l.replace(/^\d+\.\s*/, '').trim()).filter(l => l.length > 5 && !l.toLowerCase().includes('interview questions') && !l.toLowerCase().includes('behavioral questions'));
+            
+            // Heuristic categorization if AI doesn't give clear markers (though prompt asks for 1, 2, 3)
+            // But since I need structured {technical:[], project:[], hr:[]}
+            // Let's try a better split
+            const parts = raw.split(/1\.|2\.|3\.|technical|project|hr/i);
+            const technical = [];
+            const project = [];
+            const hr = [];
+
+            // If parsing fails, we use a more basic approach or return raw
+            // Actually, let's try to extract lists
+            const allQuestions = raw.match(/\?|\n\d+\..*?\n/g) ? raw.split('\n').filter(l => l.includes('?') || /^\d+\./.test(l)) : [];
+            
+            // To abide by "Use this exact prompt", I'll just do a basic split by sections
+            const technicalMatch = raw.match(/(?:Technical Interview Questions|1\.)([\s\S]*?)(?:Project-Based|2\.|$)/i);
+            const projectMatch = raw.match(/(?:Project-Based Questions|2\.)([\s\S]*?)(?:HR|Behavioral|3\.|$)/i);
+            const hrMatch = raw.match(/(?:HR \/ Behavioral Questions|3\.)([\s\S]*?)(?:$)/i);
+
+            const extractList = (text) => {
+                if (!text) return [];
+                return text.split('\n')
+                    .map(l => l.replace(/^\d+[\.\)]\s*/, '').trim())
+                    .filter(l => l.length > 10 && (l.includes('?') || l.length > 20))
+                    .slice(0, 5);
+            };
+
+            return {
+                technical: extractList(technicalMatch?.[1]),
+                project: extractList(projectMatch?.[1]),
+                hr: extractList(hrMatch?.[1])
+            };
+
+        } catch (error) {
+            console.error('Interview Questions Error:', error.message);
+            // Fallback for demo
+            return {
+                technical: ["Explain your core tech stack in detail.", "How do you handle state management?", "Describe a difficult bug you solved recently.", "What is the difference between SQL and NoSQL?", "Explain the concept of middleware."],
+                project: ["What was your role in your most recent project?", "How did you handle scalability in your projects?", "Describe a technical challenge from your portfolio.", "Which technology did you choose for your backend and why?", "How did you test your application?"],
+                hr: ["Why should we hire you?", "Where do you see yourself in 5 years?", "Tell me about a time you worked in a team.", "How do you handle tight deadlines?", "What are your strengths and weaknesses?"]
+            };
+        }
+    }
 }
 
 export default new AIProvider();

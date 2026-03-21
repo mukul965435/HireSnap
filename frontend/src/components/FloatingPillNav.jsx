@@ -27,8 +27,8 @@ const FloatingPillNav = ({ leftSlot, rightSlot, onLogoClick }) => (
                 pointerEvents: 'all',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.2rem',
-                padding: '0.38rem 0.38rem 0.38rem 0.9rem',
+                gap: '0.4rem',
+                padding: '0.45rem 0.5rem 0.45rem 1rem',
                 background: 'rgba(255,255,255,0.92)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
@@ -36,13 +36,13 @@ const FloatingPillNav = ({ leftSlot, rightSlot, onLogoClick }) => (
                 border: '1px solid rgba(0,0,0,0.09)',
                 boxShadow: '0 4px 24px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
                 width: 'fit-content',
-                maxWidth: 940,
+                maxWidth: 1250,
             }}
         >
             {/* Logo */}
             <div
                 onClick={onLogoClick}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', flexShrink: 0 }}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', flexShrink: 0 }}
             >
                 <div style={{
                     width: 28, height: 28,
@@ -58,13 +58,13 @@ const FloatingPillNav = ({ leftSlot, rightSlot, onLogoClick }) => (
             </div>
 
             {/* Thin vertical divider */}
-            <div style={{ width: 1, height: 16, background: 'rgba(0,0,0,0.1)', margin: '0 0.45rem', flexShrink: 0 }} />
+            <div style={{ width: 1, height: 16, background: 'rgba(0,0,0,0.1)', margin: '0 0.75rem', flexShrink: 0 }} />
 
             {/* Centre slot – nav links */}
             {leftSlot}
 
             {/* Push right controls to end */}
-            <div style={{ flex: 1, minWidth: 12 }} />
+            <div style={{ flex: 1, minWidth: 24 }} />
 
             {/* Right slot – auth buttons or avatar */}
             {rightSlot}

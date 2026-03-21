@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, FileText, Briefcase, LogOut, Search, GitCompare, Sun, Moon, ChevronDown, User } from 'lucide-react';
+import { LayoutDashboard, FileText, Briefcase, LogOut, Search, GitCompare, Sun, Moon, ChevronDown, User, Wand2, MessageSquare } from 'lucide-react';
 import FloatingPillNav from '../components/FloatingPillNav';
+
+const BACKEND_URL = 'http://localhost:5000';
 
 const NAV_ITEMS = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -11,6 +13,8 @@ const NAV_ITEMS = [
     { to: '/compare',   icon: GitCompare,      label: 'Compare'   },
     { to: '/jobs',      icon: Briefcase,       label: 'Job Search'},
     { to: '/analyze',   icon: Search,          label: 'AI Analyzer'},
+    { to: '/cover-letter', icon: Wand2,        label: 'Cover Letter'},
+    { to: '/interview-prep', icon: MessageSquare,  label: 'Interview Prep'},
 ];
 
 /* ─── pill-style hover helper ──────────────────────────────────── */
@@ -34,7 +38,7 @@ const TopNav = () => {
     const handleLogout = async () => { await logout(); navigate('/'); };
 
     const leftSlot = (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {NAV_ITEMS.map(item => (
                 <NavLink
                     key={item.to}
@@ -65,8 +69,17 @@ const TopNav = () => {
                     onClick={() => setOpen(p => !p)}
                     style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.28rem 0.55rem 0.28rem 0.28rem', borderRadius: 999, border: '1px solid rgba(0,0,0,0.08)', background: 'rgba(255,255,255,0.7)', cursor: 'pointer', transition: 'background 0.15s' }}
                 >
-                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'linear-gradient(135deg,#2563eb,#7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <User size={13} color="white" />
+                    <div style={{ 
+                        width: 26, height: 26, borderRadius: '50%', 
+                        background: user?.avatar ? 'none' : 'linear-gradient(135deg,#2563eb,#7c3aed)', 
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        overflow: 'hidden'
+                    }}>
+                        {user?.avatar ? (
+                            <img src={`${BACKEND_URL}${user.avatar}`} alt="Avatar" crossOrigin="anonymous" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                            <User size={13} color="white" />
+                        )}
                     </div>
                     <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#0a0a0a', maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {user?.fullName || 'Account'}

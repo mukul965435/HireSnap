@@ -7,11 +7,20 @@ import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/authRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
 import jobRoutes from './routes/jobRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import interviewRoutes from './routes/interviewRoutes.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
 // Security Middlewares
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+}));
 app.use(cors({
     origin: [/localhost:\d+$/], // Allow any port on localhost
     credentials: true
@@ -29,10 +38,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
+// Static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/interview', interviewRoutes);
 
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'up', timestamp: new Date() });

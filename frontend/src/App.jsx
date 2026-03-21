@@ -15,6 +15,8 @@ import AIAnalyzer from './pages/AIAnalyzer';
 import CompareVersions from './pages/CompareVersions';
 import JobSearch from './pages/JobSearch';
 import Profile from './pages/Profile';
+import CoverLetterGenerator from './pages/CoverLetterGenerator';
+import InterviewPrep from './pages/InterviewPrep';
 
 function App() {
     return (
@@ -37,6 +39,8 @@ function App() {
                         <Route path="/upload" element={<DashboardLayout><ResumeUpload /></DashboardLayout>} />
                         <Route path="/jobs" element={<DashboardLayout><JobSearch /></DashboardLayout>} />
                         <Route path="/analyze" element={<DashboardLayout><AIAnalyzer /></DashboardLayout>} />
+                        <Route path="/cover-letter" element={<DashboardLayout><CoverLetterGenerator /></DashboardLayout>} />
+                        <Route path="/interview-prep" element={<DashboardLayout><InterviewPrep /></DashboardLayout>} />
                     </Route>
                 </Routes>
             </Router>

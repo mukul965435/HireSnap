@@ -41,7 +41,8 @@ export const register = async (req, res, next) => {
                 id: user._id,
                 fullName: user.fullName,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                avatar: user.avatar
             }
         });
     } catch (error) {
@@ -73,7 +74,8 @@ export const login = async (req, res, next) => {
                 id: user._id,
                 fullName: user.fullName,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                avatar: user.avatar
             }
         });
     } catch (error) {
