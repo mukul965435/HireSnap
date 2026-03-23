@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
 import { useNavigate } from 'react-router-dom';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 /* ─── Animation variants ─────────────────────────────────────── */
 const container = {

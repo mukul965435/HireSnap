@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutDashboard, FileText, Briefcase, LogOut, Search, GitCompare, Sun, Moon, ChevronDown, User, Wand2, MessageSquare } from 'lucide-react';
 import FloatingPillNav from '../components/FloatingPillNav';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 const NAV_ITEMS = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },

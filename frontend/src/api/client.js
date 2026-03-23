@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
-    timeout: 300000, // 5 minutes timeout
+    baseURL: `${BASE_URL}/api`,
+    timeout: 300000, 
 });
 
 api.interceptors.request.use((config) => {
@@ -18,12 +20,11 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // error.response is undefined for network errors (timeout, offline, etc.)
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
                 const refreshToken = localStorage.getItem('refreshToken');
-                const res = await axios.post('http://localhost:5000/api/auth/refresh-token', { refreshToken });
+                const res = await axios.post(`${BASE_URL}/api/auth/refresh-token`, { refreshToken });
                 if (res.status === 200) {
                     localStorage.setItem('accessToken', res.data.accessToken);
                     localStorage.setItem('refreshToken', res.data.refreshToken);
