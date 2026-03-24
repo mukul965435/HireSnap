@@ -22,7 +22,12 @@ app.use(helmet({
     crossOriginResourcePolicy: false,
 }));
 app.use(cors({
-    origin: [/localhost:\d+$/], // Allow any port on localhost
+    origin: [
+        /localhost:\d+$/,
+        /vercel\.app$/, // Allow any Vercel deployment
+        /netlify\.app$/, // Allow Netlify if used
+        'https://hiresnap.onrender.com' // Self-link just in case
+    ],
     credentials: true
 }));
 

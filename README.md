@@ -1,4 +1,4 @@
-# HireSnap - AI-Powered Resume Analyzer & Job Matcher
+# HireSnap - AI-Powered Resume Analyzer & Job Matcher 
 
 HireSnap is a production-ready MERN application that helps users optimize their resumes for Applicant Tracking Systems (ATS) and match them with relevant job opportunities using semantic embeddings and AI-driven analysis.
 
