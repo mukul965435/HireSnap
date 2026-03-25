@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { User, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
+import { User, Mail, Lock, ArrowRight, Sparkles, Chrome } from 'lucide-react';
 import FloatingPillNav from '../components/FloatingPillNav';
 
 const AmbientBackground = () => (
