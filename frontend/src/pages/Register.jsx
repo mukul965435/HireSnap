@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { User, Mail, Lock, ArrowRight, Sparkles, Chrome } from 'lucide-react';
+import { User, Mail, Lock, ArrowRight, Sparkles, Monitor } from 'lucide-react';
 import FloatingPillNav from '../components/FloatingPillNav';
 
 const AmbientBackground = () => (
@@ -207,7 +207,7 @@ const Register = () => {
                                         transition: 'all 0.2s', marginBottom: '1.5rem'
                                     }}
                                 >
-                                    <Chrome size={18} color="#4285F4" />
+                                    <Monitor size={18} color="#4285F4" />
                                     Sign up with Google
                                 </motion.button>
 
